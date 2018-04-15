@@ -6,15 +6,16 @@ import QtQuick.Controls.Styles 1.4
 
 Window {
     visible: true
-    width: 960
-    minimumWidth: 960
-    maximumWidth: 960
+    width: 965
+    minimumWidth: 965
+    maximumWidth: 965
     height: 650
     minimumHeight: 650
     maximumHeight: 650
-    title: "TETRIS ON STEROIDS"
+    title: "TETRIS"
     Component.onCompleted: {
-        loader.sourceComponent = myDynComp;
+        corelogic.pieceColor = corelogic.getRandomColor()
+        loader.sourceComponent = dynamicPiece;
     }
 
     Rectangle {
@@ -48,6 +49,12 @@ Window {
                         if (corelogic.canMoveDown() === true)
                             corelogic.movePieceDown()
                     }
+                    else if(event.key === Qt.Key_Up)
+                    {
+                        console.log("UP")
+                        corelogic.rotatePiece()
+                    }
+
                     event.accepted = true;
                 }
             }
@@ -122,27 +129,8 @@ Window {
                         Loader {
                             id: loader
                         }
-
-                        Component {
-                            id: myDynComp
-                            Rectangle {
-                                id: movingPiece
-                                x: corelogic.pieceX
-                                y: corelogic.pieceY
-                                width: corelogic.pieceWidth
-                                height: corelogic.pieceHeight
-                                color: "green"
-                                onYChanged: {
-                                    if (corelogic.canMoveDown() === false)
-                                    {
-                                        corelogic.setPieceAtBoard(corelogic.getBoardIndex(x, y), color)
-                                        corelogic.checkForCompleteRow()
-                                        loader.sourceComponent = undefined;
-                                        corelogic.resetPiece()
-                                        loader.sourceComponent = myDynComp
-                                    }
-                                }
-                            }
+                        DynamicPiece {
+                            id: dynamicPiece
                         }
                     }
 
