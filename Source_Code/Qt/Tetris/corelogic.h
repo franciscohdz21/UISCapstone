@@ -14,7 +14,9 @@ class CoreLogic : public QTimer
     Q_PROPERTY(QStringList dynamicPiece READ dynamicPiece WRITE setDynamicPiece NOTIFY dynamicPieceChanged)
     Q_PROPERTY(double pieceX READ pieceX WRITE setPieceX NOTIFY pieceXChanged)
     Q_PROPERTY(double pieceY READ pieceY WRITE setPieceY NOTIFY pieceYChanged)
-    Q_PROPERTY(QString pieceColor READ pieceColor WRITE setPieceColor NOTIFY pieceColorChanged)
+    Q_PROPERTY(int gameLevel READ gameLevel WRITE setGameLevel NOTIFY gameLevelChanged)
+    Q_PROPERTY(bool dynamicPieceMovedDownOnce READ dynamicPieceMovedDownOnce WRITE setDynamicPieceMovedDownOnce NOTIFY dynamicPieceMovedDownOnceChanged)
+    Q_PROPERTY(bool gameOver READ gameOver WRITE setGameOver NOTIFY gameOverChanged)
 
 public:
     ~CoreLogic();
@@ -29,17 +31,29 @@ public:
     void setPieceX(double pieceX);
     double pieceY()const;
     void setPieceY(double pieceY);
-    QString pieceColor()const;
-    void setPieceColor(QString color);
+    int gameLevel()const;
+    void setGameLevel(int level);
+    bool dynamicPieceMovedDownOnce()const;
+    void setDynamicPieceMovedDownOnce(bool trueOrFalse);
+    bool gameOver()const;
+    void setGameOver(bool trueOrFalse);
 
     //Other
     void init();
+    void buildPieces();
+    void buildEasyPieces();
+    void buildMediumPieces();
+    void buildHardPieces();
     Q_INVOKABLE int getBoardIndex(double x, double y);
     int getBoardIndexFromPieceIndex(int pieceIndex);
     Q_INVOKABLE void setPieceAtBoard();
     Q_INVOKABLE void checkForCompleteRow();
     Q_INVOKABLE int getCurrentPiece()const;
     Q_INVOKABLE void setCurrentPiece(int piece);
+    void loadNewPiece();
+    int getRandomNumber(int range);
+    Q_INVOKABLE void resetGame();
+    void resetBoard();
 
     //Color
     QStringList listOfColors();
@@ -52,8 +66,6 @@ public:
     void setLeftMostPiecesIndexes();
     QVector <int> rightMostPiecesIndexes()const;
     void setRightMostPiecesIndexes();
-//    QVector <int> getPieceIndexesInsideBoard()const;
-//    void setPieceIndexesInsideBoard();
     Q_INVOKABLE bool canMoveLeft();
     Q_INVOKABLE bool canMoveRight();
     Q_INVOKABLE bool canMoveDown();
@@ -78,8 +90,10 @@ signals:
     void boardChanged();
     void pieceXChanged();
     void pieceYChanged();
-    void pieceColorChanged();
     void dynamicPieceChanged();
+    void gameLevelChanged();
+    void dynamicPieceMovedDownOnceChanged();
+    void gameOverChanged();
 
 public slots:
     void gameRunning();
@@ -98,11 +112,17 @@ private:
     int m_moveDownVelocity;
     int m_currentPiece;
     QStringList m_listOfColors;
-    QString m_pieceColor;
     QVector <int> m_downMostPiecesIndexes;
     QVector <int> m_leftMostPiecesIndexes;
     QVector <int> m_rightMostPiecesIndexes;
     QVector <int> m_pieceIndexesInsideBoard;
+    int m_dynamicPieceBoardState;
+    QVector <QStringList> m_easyPieces;
+    QVector <QStringList>  m_mediumPieces;
+    QVector <QStringList> m_hardPieces;
+    int m_gameLevel;
+    bool m_dynamicPieceMovedDownOnce;
+    bool m_gameOver;
 };
 
 #endif // CORELOGIC_H

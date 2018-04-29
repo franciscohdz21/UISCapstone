@@ -7,7 +7,10 @@ Component {
         height: 60
         x: corelogic.pieceX
         y: corelogic.pieceY
+        property bool movedDownOnce: corelogic.dynamicPieceMovedDownOnce
+
         onYChanged: {
+            corelogic.dynamicPieceMovedDownOnce = true
             if (corelogic.canMoveDown() === false)
             {
                 loader.sourceComponent = undefined
@@ -15,6 +18,7 @@ Component {
                 corelogic.checkForCompleteRow()
                 corelogic.resetPiece()
                 loader.sourceComponent = dynamicPiece
+                corelogic.dynamicPieceMovedDownOnce = false
             }
         }
         Rectangle {
@@ -26,7 +30,7 @@ Component {
             color: corelogic.dynamicPiece[0]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[0] === "transparent")
+                if ((corelogic.dynamicPiece[0] === "transparent") || (corelogic.dynamicPiece[0] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -41,7 +45,7 @@ Component {
             color: corelogic.dynamicPiece[1]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[1] === "transparent")
+                if ((corelogic.dynamicPiece[1] === "transparent") || (corelogic.dynamicPiece[1] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -56,7 +60,7 @@ Component {
             color: corelogic.dynamicPiece[2]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[2] === "transparent")
+                if ((corelogic.dynamicPiece[2] === "transparent") || (corelogic.dynamicPiece[2] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -71,7 +75,9 @@ Component {
             color: corelogic.dynamicPiece[3]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[3] === "transparent")
+//                if ((corelogic.dynamicPiece[3] === "transparent"))
+//                    return "transparent"
+                if ((corelogic.dynamicPiece[3] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -86,7 +92,7 @@ Component {
             color: corelogic.dynamicPiece[4]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[4] === "transparent")
+                if ((corelogic.dynamicPiece[4] === "transparent") || (corelogic.dynamicPiece[4] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -101,7 +107,7 @@ Component {
             color: corelogic.dynamicPiece[5]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[5] === "transparent")
+                if ((corelogic.dynamicPiece[5] === "transparent") || (corelogic.dynamicPiece[5] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -116,7 +122,7 @@ Component {
             color: corelogic.dynamicPiece[6]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[6] === "transparent")
+                if ((corelogic.dynamicPiece[6] === "transparent") || (corelogic.dynamicPiece[6] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -131,7 +137,7 @@ Component {
             color: corelogic.dynamicPiece[7]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[7] === "transparent")
+                if ((corelogic.dynamicPiece[7] === "transparent") || (corelogic.dynamicPiece[7] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -146,7 +152,7 @@ Component {
             color: corelogic.dynamicPiece[8]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[8] === "transparent")
+                if ((corelogic.dynamicPiece[8] === "transparent") || (corelogic.dynamicPiece[8] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -161,7 +167,7 @@ Component {
             color: corelogic.dynamicPiece[9]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[9] === "transparent")
+                if ((corelogic.dynamicPiece[9] === "transparent") || (corelogic.dynamicPiece[9] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -176,7 +182,7 @@ Component {
             color: corelogic.dynamicPiece[10]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[10] === "transparent")
+                if ((corelogic.dynamicPiece[10] === "transparent") || (corelogic.dynamicPiece[10] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -191,7 +197,7 @@ Component {
             color: corelogic.dynamicPiece[11]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[11] === "transparent")
+                if ((corelogic.dynamicPiece[11] === "transparent") || (corelogic.dynamicPiece[11] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -206,7 +212,7 @@ Component {
             color: corelogic.dynamicPiece[12]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[12] === "transparent")
+                if ((corelogic.dynamicPiece[12] === "transparent") || (corelogic.dynamicPiece[12] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -221,7 +227,7 @@ Component {
             color: corelogic.dynamicPiece[13]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[13] === "transparent")
+                if ((corelogic.dynamicPiece[13] === "transparent") || (corelogic.dynamicPiece[13] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -236,7 +242,7 @@ Component {
             color: corelogic.dynamicPiece[14]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[14] === "transparent")
+                if ((corelogic.dynamicPiece[14] === "transparent") || (corelogic.dynamicPiece[14] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
@@ -251,7 +257,7 @@ Component {
             color: corelogic.dynamicPiece[15]
             border.width: 1
             border.color: {
-                if (corelogic.dynamicPiece[15] === "transparent")
+                if ((corelogic.dynamicPiece[15] === "transparent") || (corelogic.dynamicPiece[15] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"

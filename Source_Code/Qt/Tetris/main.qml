@@ -3,6 +3,7 @@ import QtQuick.Window 2.2
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.3
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Dialogs 1.3
 
 Window {
     visible: true
@@ -14,8 +15,20 @@ Window {
     maximumHeight: 650
     title: "TETRIS"
     Component.onCompleted: {
-        corelogic.pieceColor = corelogic.getRandomColor()
         loader.sourceComponent = dynamicPiece;
+    }
+
+    MessageDialog {
+        id: gameOverMessageDialog
+        title: "Game over."
+        text: "Thanks for playing!"
+        onAccepted: {
+            corelogic.resetGame()
+            startButton.state = ""
+            startButtonText.state = ""
+            corelogic.gameOver = false
+        }
+        visible: corelogic.gameOver
     }
 
     Rectangle {
@@ -26,9 +39,6 @@ Window {
             id: outerMostMouseArea
             anchors.fill: parent
             hoverEnabled: true
-            onPositionChanged: {
-//                console.log("Mouse X: " + mouse.x + ", Mouse Y: " + mouse.y)
-            }
         }
         Item {
             id: keysPressedItem
@@ -51,8 +61,8 @@ Window {
                     }
                     else if(event.key === Qt.Key_Up)
                     {
-                        console.log("UP")
-                        corelogic.rotatePiece()
+                        if (corelogic.canRotate() === true)
+                            corelogic.rotatePiece()
                     }
 
                     event.accepted = true;
@@ -80,6 +90,38 @@ Window {
                     border.color: "#17FF00"
                     border.width: 1
                     color: "black"
+                    Text {
+                        x: 10
+                        y: 10
+                        text: "Developed by:"
+                        color: "#17FF00"
+                        font.family: "Courier"
+                        font.pixelSize: 14
+                    }
+                    Text {
+                        x: 14
+                        y: 110
+                        text: "Francisco Hernandez"
+                        color: "#17FF00"
+                        font.family: "Courier"
+                        font.pixelSize: 14
+                    }
+                    Text {
+                        x: 18
+                        y: 210
+                        text: "Jonathan Tielebein"
+                        color: "#17FF00"
+                        font.family: "Courier"
+                        font.pixelSize: 14
+                    }
+                    Text {
+                        x: 20
+                        y: 310
+                        text: "Zachary Trujillo"
+                        color: "#17FF00"
+                        font.family: "Courier"
+                        font.pixelSize: 14
+                    }
                 }
                 Rectangle {
                     id: middleRectangle
@@ -142,6 +184,77 @@ Window {
                     border.color: "#17FF00"
                     border.width: 1
                     color: "black"
+                    Text {
+                        x: 45
+                        y: 20
+                        text: "Select difficulty:"
+                        font.family: "Courier"
+                        font.pixelSize: 14
+                        color: "#17FF00"
+                    }
+                    ColumnLayout {
+                        x: 10
+                        y: 120
+                        spacing: 20
+                        RadioButton {
+                            id: easyRadioButton
+                            checked: true
+                            onCheckedChanged: {
+                                if (easyRadioButton.checked === true)
+                                    corelogic.gameLevel = 1
+                                startButtonText.state = ""
+                                startButton.state = ""
+                                corelogic.stopTimer()
+                            }
+                            Text {
+                                x: 50
+                                y: 10
+                                text: qsTr("Easy")
+                                font.family: "Courier"
+                                font.pixelSize: 14
+                                color: "#17FF00"
+                            }
+                        }
+                        RadioButton {
+                            id: mediumRadioButton
+                            checked: false
+                            onCheckedChanged: {
+                                if (mediumRadioButton.checked === true)
+                                    corelogic.gameLevel = 2
+                                startButtonText.state = ""
+                                startButton.state = ""
+                                corelogic.stopTimer()
+                            }
+                            Text {
+                                x: 50
+                                y: 10
+                                text: qsTr("Medium")
+                                font.family: "Courier"
+                                font.pixelSize: 14
+                                color: "#17FF00"
+                            }
+                        }
+                        RadioButton {
+                            id: hardRadioButton
+                            checked: false
+                            onCheckedChanged: {
+                                if (hardRadioButton.checked === true)
+                                    corelogic.gameLevel = 3
+                                startButtonText.state = ""
+                                startButton.state = ""
+                                corelogic.stopTimer()
+                            }
+
+                            Text {
+                                x: 50
+                                y: 10
+                                text: qsTr("Hard")
+                                font.family: "Courier"
+                                font.pixelSize: 14
+                                color: "#17FF00"
+                            }
+                        }
+                    }
                 }
             }
             Item {

@@ -1,13 +1,16 @@
 #include <QDebug>
 #include <QString>
 #include <QStringList>
+#include <QVector>
 #include <QTimer>
 #include <cstdlib>
+#include <ctime>
 #include "corelogic.h"
 
 //table info
 #define TABLE_WIDTH 26
 #define TABLE_HEIGHT 36
+
 //colors
 #define BLACK        "#000000"
 #define BROWN        "#8B4513"
@@ -18,8 +21,10 @@
 #define PINK         "#F711EC"
 #define RED          "#F71111"
 #define GREY         "#A0A0A0"
+#define WHITE        "#ffffff"
 #define TRANSPARENT  "transparent"
 #define OUT_OF_BOARD "OUT OF BOARD"
+#define COLOR        "color"
 
 
 CoreLogic::~CoreLogic()
@@ -33,6 +38,10 @@ CoreLogic &CoreLogic::Instance()
 }
 void CoreLogic::init()
 {
+    m_dynamicPieceBoardState = -1;
+    m_dynamicPieceMovedDownOnce = false;
+    m_gameOver = false;
+
     //add colors
     m_listOfColors.push_back(BROWN);
     m_listOfColors.push_back(YELLOW);
@@ -42,46 +51,377 @@ void CoreLogic::init()
     m_listOfColors.push_back(PINK);
     m_listOfColors.push_back(RED);
     m_listOfColors.push_back(GREY);
-    //dynamic piece colors
-    m_dynamicPiece.push_back(YELLOW);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_dynamicPiece.push_back(TRANSPARENT);
-    m_moveDownVelocity = 1000;
+    m_listOfColors.push_back(WHITE);
+
+    //set game level
+    m_gameLevel = 1;
+    if (m_gameLevel == 1)
+        m_moveDownVelocity = 1000;
+    else if (m_gameLevel == 2)
+        m_moveDownVelocity = 500;
+    else if (m_gameLevel == 3)
+        m_moveDownVelocity = 250;
+
+    //build and load pieces
+    buildPieces();
+    loadNewPiece();
+
+    //init timer
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(gameRunning()));
+
+    //set piece
     setPieceX(180);
     setPieceY(0);
-    for (auto i = 0; i < (TABLE_HEIGHT*TABLE_WIDTH); i++)
-    {
-        m_board.push_back(BLACK);
-    }
-//    m_board.push_back(BLACK);
-//    for (auto i = 0; i < (25); i++)
-//    {
-//        m_board.push_back("#FF0000");
-//    }
-//    for (auto i = 0; i < (884); i++)
-//    {
-//        m_board.push_back(BLACK);
-//    }
-//    for (auto i = 0; i < (26); i++)
-//    {
-//        m_board.push_back("#FF0000");
-//    }
+
+    //build board
+    resetBoard();
     emit boardChanged();
+}
+void CoreLogic::buildPieces()
+{
+    //clear
+    m_easyPieces.clear();
+    m_mediumPieces.clear();
+    m_hardPieces.clear();
+
+    //build
+    buildEasyPieces();
+    buildMediumPieces();
+    buildHardPieces();
+
+    //add easy pieces to medium pieces
+    for (int i = 0; i < m_easyPieces.size(); i++)
+    {
+        m_mediumPieces.push_back(m_easyPieces.at(i));
+    }
+
+    //add medium pieces to hard pieces
+    for (int i = 0; i < m_mediumPieces.size(); i++)
+    {
+        m_hardPieces.push_back(m_mediumPieces.at(i));
+    }
+}
+void CoreLogic::buildEasyPieces()
+{
+    //piece 1
+    QStringList piece;
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    m_easyPieces.push_back(piece);
+    piece.clear();
+
+    //piece 2
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    m_easyPieces.push_back(piece);
+    piece.clear();
+
+    //piece 3
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    m_easyPieces.push_back(piece);
+    piece.clear();
+
+    //piece 4
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    m_easyPieces.push_back(piece);
+    piece.clear();
+
+    //piece 5
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    m_easyPieces.push_back(piece);
+    piece.clear();
+}
+void CoreLogic::buildMediumPieces()
+{
+    //piece 1
+    QStringList piece;
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    m_mediumPieces.push_back(piece);
+    piece.clear();
+
+    //piece 2
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    m_mediumPieces.push_back(piece);
+    piece.clear();
+
+    //piece 3
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    m_mediumPieces.push_back(piece);
+    piece.clear();
+
+    //piece 4
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    m_mediumPieces.push_back(piece);
+    piece.clear();
+}
+void CoreLogic::buildHardPieces()
+{
+    //piece 1
+    QStringList piece;
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+
+    m_hardPieces.push_back(piece);
+    piece.clear();
+
+    //piece 2
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+
+    m_hardPieces.push_back(piece);
+    piece.clear();
+
+    //piece 3
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+
+    m_hardPieces.push_back(piece);
+    piece.clear();
+
+    //piece 4
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+
+    piece.push_back(TRANSPARENT);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+
+    piece.push_back(COLOR);
+    piece.push_back(COLOR);
+    piece.push_back(TRANSPARENT);
+    piece.push_back(TRANSPARENT);
+
+    m_hardPieces.push_back(piece);
+    piece.clear();
 }
 int CoreLogic::getBoardIndex(double x, double y)
 {
@@ -122,13 +462,14 @@ int CoreLogic::getBoardIndexFromPieceIndex(int pieceIndex)
         return firstIndex + (TABLE_WIDTH*3) + 2;
     else if (pieceIndex == 15)
         return firstIndex + (TABLE_WIDTH*3) + 3;
-    return -1;
+    else
+        return -1;
 }
 void CoreLogic::setPieceAtBoard()
 {
     for (int i = 0; i < m_dynamicPiece.size(); i++)
     {
-        if (m_dynamicPiece.at(i) != TRANSPARENT)
+        if (m_dynamicPiece.at(i) != TRANSPARENT && m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
             m_board.replace(getBoardIndexFromPieceIndex(i), m_dynamicPiece.at(i));
         }
@@ -178,16 +519,54 @@ void CoreLogic::setCurrentPiece(int piece)
 {
     m_currentPiece = piece;
 }
+void CoreLogic::loadNewPiece()
+{
+    //get piece according to level
+    if (m_gameLevel == 1)
+        m_dynamicPiece = m_easyPieces.at(getRandomNumber(4));
+
+    else if (m_gameLevel == 2)
+        m_dynamicPiece = m_mediumPieces.at(getRandomNumber(8));
+
+    else if (m_gameLevel == 3)
+        m_dynamicPiece = m_hardPieces.at(getRandomNumber(7));
+
+    //fill color
+    for (int i = 0; i < m_dynamicPiece.size(); i++)
+    {
+        if (m_dynamicPiece.at(i) == "color")
+            m_dynamicPiece.replace(i, getRandomColor());
+    }
+    emit dynamicPieceChanged();
+}
+int CoreLogic::getRandomNumber(int range)
+{
+    int randomNumber;
+    srand(time(NULL));
+    randomNumber = rand()% range;
+    return randomNumber;
+}
+void CoreLogic::resetGame()
+{
+    resetPiece();
+    resetBoard();
+}
+void CoreLogic::resetBoard()
+{
+    m_board.clear();
+    for (auto i = 0; i < (TABLE_HEIGHT*TABLE_WIDTH); i++)
+    {
+        m_board.push_back(BLACK);
+    }
+    emit boardChanged();
+}
 QStringList CoreLogic::listOfColors()
 {
     return m_listOfColors;
 }
 QString CoreLogic::getRandomColor()
 {
-    int randomNumber;
-    srand(time(NULL));
-    randomNumber = rand()% 8;
-    return m_listOfColors.at(randomNumber);
+    return m_listOfColors.at(getRandomNumber(8));
 }
 QVector<int> CoreLogic::downMostPiecesIndexes() const
 {
@@ -195,20 +574,45 @@ QVector<int> CoreLogic::downMostPiecesIndexes() const
 }
 void CoreLogic::setDownMostPiecesIndexes()
 {
-    bool colorPieceFound = false;
     m_downMostPiecesIndexes.clear();
-    for (int i = 15; i >= 0; i--)
+    //column 1
+    for (int i = 12; i >= 0; i=i-4)
     {
-        if (i == 11 && colorPieceFound == true)
-            break;
-        else if (i == 7 && colorPieceFound == true)
-            break;
-        else if (i == 3 && colorPieceFound == true)
-            break;
-        if (m_dynamicPiece.at(i) != TRANSPARENT)
+        qDebug () << i;
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
-            colorPieceFound = true;
             m_downMostPiecesIndexes.push_back(i);
+            break;
+        }
+    }
+
+    //column 2
+    for (int i = 13; i >= 1; i=i-4)
+    {
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
+        {
+            m_downMostPiecesIndexes.push_back(i);
+            break;
+        }
+    }
+
+    //column 3
+    for (int i = 14; i >= 2; i=i-4)
+    {
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
+        {
+            m_downMostPiecesIndexes.push_back(i);
+            break;
+        }
+    }
+
+    //column 4
+    for (int i = 15; i >= 3; i=i-4)
+    {
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
+        {
+            m_downMostPiecesIndexes.push_back(i);
+            break;
         }
     }
 }
@@ -218,11 +622,53 @@ QVector<int> CoreLogic::leftMostPiecesIndexes() const
 }
 void CoreLogic::setLeftMostPiecesIndexes()
 {
+    m_leftMostPiecesIndexes.clear();
+    //row 1
+    for (int i = 12; i >= 0; i=i-4)
+    {
+        qDebug () << i;
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
+        {
+            m_downMostPiecesIndexes.push_back(i);
+            break;
+        }
+    }
+
+    //row 2
+    for (int i = 13; i >= 1; i=i-4)
+    {
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
+        {
+            m_downMostPiecesIndexes.push_back(i);
+            break;
+        }
+    }
+
+    //row 3
+    for (int i = 14; i >= 2; i=i-4)
+    {
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
+        {
+            m_downMostPiecesIndexes.push_back(i);
+            break;
+        }
+    }
+
+    //row 4
+    for (int i = 15; i >= 3; i=i-4)
+    {
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
+        {
+            m_downMostPiecesIndexes.push_back(i);
+            break;
+        }
+    }
+
     bool colorPieceFound = false;
     m_leftMostPiecesIndexes.clear();
     for (int i = 0; i != 19; i=i+4)
     {
-        if (i < 15 && i > -1 && m_dynamicPiece.at(i) != TRANSPARENT && m_dynamicPiece.at(i) != OUT_OF_BOARD)
+        if (i < 16 && i > -1 && m_dynamicPiece.at(i) != TRANSPARENT && m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
             colorPieceFound = true;
             m_leftMostPiecesIndexes.push_back(i);
@@ -257,7 +703,7 @@ void CoreLogic::setRightMostPiecesIndexes()
     m_rightMostPiecesIndexes.clear();
     for (int i = 3; i != 16; i=i+4)
     {
-        if (i < 15 && i > -1 && m_dynamicPiece.at(i) != TRANSPARENT && m_dynamicPiece.at(i) != OUT_OF_BOARD)
+        if (i < 16 && i > -1 && m_dynamicPiece.at(i) != TRANSPARENT && m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
             colorPieceFound = true;
             m_rightMostPiecesIndexes.push_back(i);
@@ -282,57 +728,6 @@ void CoreLogic::setRightMostPiecesIndexes()
         }
     }
 }
-//QVector<int> CoreLogic::getPieceIndexesInsideBoard() const
-//{
-//    return m_pieceIndexesInsideBoard;
-//}
-//void CoreLogic::setPieceIndexesInsideBoard()
-//{
-//    //first column
-//    if (m_dynamicPiece.at(0)  != TRANSPARENT ||
-//        m_dynamicPiece.at(4)  != TRANSPARENT ||
-//        m_dynamicPiece.at(8)  != TRANSPARENT ||
-//        m_dynamicPiece.at(12) != TRANSPARENT)
-//    {
-//        m_pieceIndexesInsideBoard.push_back(0);
-//        m_pieceIndexesInsideBoard.push_back(4);
-//        m_pieceIndexesInsideBoard.push_back(8);
-//        m_pieceIndexesInsideBoard.push_back(12);
-//    }
-//    //second column
-//    if (m_dynamicPiece.at(1)  != TRANSPARENT ||
-//        m_dynamicPiece.at(5)  != TRANSPARENT ||
-//        m_dynamicPiece.at(9)  != TRANSPARENT ||
-//        m_dynamicPiece.at(13) != TRANSPARENT)
-//    {
-//        m_pieceIndexesInsideBoard.push_back(1);
-//        m_pieceIndexesInsideBoard.push_back(5);
-//        m_pieceIndexesInsideBoard.push_back(9);
-//        m_pieceIndexesInsideBoard.push_back(13);
-//    }
-//    //third column
-//    if (m_dynamicPiece.at(2)  != TRANSPARENT ||
-//        m_dynamicPiece.at(6)  != TRANSPARENT ||
-//        m_dynamicPiece.at(10) != TRANSPARENT ||
-//        m_dynamicPiece.at(14) != TRANSPARENT)
-//    {
-//        m_pieceIndexesInsideBoard.push_back(2);
-//        m_pieceIndexesInsideBoard.push_back(6);
-//        m_pieceIndexesInsideBoard.push_back(10);
-//        m_pieceIndexesInsideBoard.push_back(14);
-//    }
-//    //fourth column
-//    if (m_dynamicPiece.at(3)  != TRANSPARENT ||
-//        m_dynamicPiece.at(7)  != TRANSPARENT ||
-//        m_dynamicPiece.at(11) != TRANSPARENT ||
-//        m_dynamicPiece.at(15) != TRANSPARENT)
-//    {
-//        m_pieceIndexesInsideBoard.push_back(3);
-//        m_pieceIndexesInsideBoard.push_back(7);
-//        m_pieceIndexesInsideBoard.push_back(11);
-//        m_pieceIndexesInsideBoard.push_back(15);
-//    }
-//}
 bool CoreLogic::canMoveLeft()
 {
     setLeftMostPiecesIndexes();
@@ -354,6 +749,8 @@ bool CoreLogic::canMoveRight()
     setRightMostPiecesIndexes();
     for (int i = 0; i < m_rightMostPiecesIndexes.size(); i++)
     {
+        qDebug () << getBoardIndexFromPieceIndex(m_rightMostPiecesIndexes.at(i))+1 % TABLE_WIDTH;
+
         if ((getBoardIndexFromPieceIndex(m_rightMostPiecesIndexes.at(i))+1) % TABLE_WIDTH == 0)
         {
             return false;
@@ -363,7 +760,8 @@ bool CoreLogic::canMoveRight()
 }
 bool CoreLogic::canMoveDown()
 {
-    setDownMostPiecesIndexes();
+    setDownMostPiecesIndexes();  
+    //check bouds
     for (int i = 0; i < m_downMostPiecesIndexes.size(); i++)
     {
         if (getBoardIndexFromPieceIndex(m_downMostPiecesIndexes.at(i)) > 909)
@@ -372,6 +770,15 @@ bool CoreLogic::canMoveDown()
         }
         else if (m_board.at(getBoardIndexFromPieceIndex(m_downMostPiecesIndexes.at(i)) + TABLE_WIDTH) != BLACK)
         {
+            //game over
+            if (m_dynamicPieceMovedDownOnce == false)
+            {
+                stopTimer();
+                setGameOver(true);
+                return false;
+            }
+
+            //game continues
             return false;
         }
     }
@@ -379,116 +786,136 @@ bool CoreLogic::canMoveDown()
 }
 bool CoreLogic::canRotate()
 {
-//    setPieceIndexesInsideBoard();
-//    //store busy board indexes
-//    QVector <int> busyBoardIndexes;
-//    for (int i = 0; i < m_pieceIndexesInsideBoard.size(); i++)
-//    {
-//        busyBoardIndexes.push_back(getBoardIndexFromPieceIndex(m_pieceIndexesInsideBoard.at(i)));
-//    }
-//    QStringList dynamicPieceCopy = m_dynamicPiece;
-
-//    //rotate copy of piece
-//    QString color = dynamicPieceCopy.at(0);
-//    dynamicPieceCopy.replace(0, dynamicPieceCopy.at(12));
-//    dynamicPieceCopy.replace(12, dynamicPieceCopy.at(15));
-//    dynamicPieceCopy.replace(15, dynamicPieceCopy.at(3));
-//    dynamicPieceCopy.replace(3, color);
-
-//    color = dynamicPieceCopy.at(1);
-//    dynamicPieceCopy.replace(1, dynamicPieceCopy.at(8));
-//    dynamicPieceCopy.replace(8, dynamicPieceCopy.at(14));
-//    dynamicPieceCopy.replace(14, dynamicPieceCopy.at(7));
-//    dynamicPieceCopy.replace(7, color);
-
-//    color = dynamicPieceCopy.at(2);
-//    dynamicPieceCopy.replace(2, dynamicPieceCopy.at(4));
-//    dynamicPieceCopy.replace(4, dynamicPieceCopy.at(13));
-//    dynamicPieceCopy.replace(13, dynamicPieceCopy.at(11));
-//    dynamicPieceCopy.replace(11, color);
-
-//    color = m_dynamicPiece.at(5);
-//    dynamicPieceCopy.replace(5, dynamicPieceCopy.at(9));
-//    dynamicPieceCopy.replace(9, dynamicPieceCopy.at(10));
-//    dynamicPieceCopy.replace(10, dynamicPieceCopy.at(6));
-//    dynamicPieceCopy.replace(6, color);
-
-//    //store buys indexes of rotated piece
-//    QVector <int> rotatedPieceIndexes;
-
-//    //first column
-//    if (dynamicPieceCopy.at(0)  != TRANSPARENT ||
-//        dynamicPieceCopy.at(4)  != TRANSPARENT ||
-//        dynamicPieceCopy.at(8)  != TRANSPARENT ||
-//        dynamicPieceCopy.at(12) != TRANSPARENT)
-//    {
-//        rotatedPieceIndexes.push_back(0);
-//        rotatedPieceIndexes.push_back(4);
-//        rotatedPieceIndexes.push_back(8);
-//        rotatedPieceIndexes.push_back(12);
-//    }
-//    //second column
-//    if (dynamicPieceCopy.at(1)  != TRANSPARENT ||
-//        dynamicPieceCopy.at(5)  != TRANSPARENT ||
-//        dynamicPieceCopy.at(9)  != TRANSPARENT ||
-//        dynamicPieceCopy.at(13) != TRANSPARENT)
-//    {
-//        rotatedPieceIndexes.push_back(1);
-//        rotatedPieceIndexes.push_back(5);
-//        rotatedPieceIndexes.push_back(9);
-//        rotatedPieceIndexes.push_back(13);
-//    }
-//    //third column
-//    if (dynamicPieceCopy.at(2)  != TRANSPARENT ||
-//        dynamicPieceCopy.at(6)  != TRANSPARENT ||
-//        dynamicPieceCopy.at(10) != TRANSPARENT ||
-//        dynamicPieceCopy.at(14) != TRANSPARENT)
-//    {
-//        rotatedPieceIndexes.push_back(2);
-//        rotatedPieceIndexes.push_back(6);
-//        rotatedPieceIndexes.push_back(10);
-//        rotatedPieceIndexes.push_back(14);
-//    }
-//    //fourth column
-//    if (dynamicPieceCopy.at(3)  != TRANSPARENT ||
-//        dynamicPieceCopy.at(7)  != TRANSPARENT ||
-//        dynamicPieceCopy.at(11) != TRANSPARENT ||
-//        dynamicPieceCopy.at(15) != TRANSPARENT)
-//    {
-//        rotatedPieceIndexes.push_back(3);
-//        rotatedPieceIndexes.push_back(7);
-//        rotatedPieceIndexes.push_back(11);
-//        rotatedPieceIndexes.push_back(15);
-//    }
-
-//    //store rotated busy board indexes
-//    QVector <int> rotatedPieceBoardIndexes;
-//    for (int i = 0; i < rotatedPieceIndexes.size(); i++)
-//    {
-//        rotatedPieceBoardIndexes.push_back(getBoardIndexFromPieceIndex(rotatedPieceIndexes.at(i)));
-//    }
-
-//    //check for legal move
-//    for (int i = 0; i < rotatedPieceBoardIndexes.size(); i++)
-//    {
-//        for (int j = 0; j < busyBoardIndexes.size(); j++)
-//        {
-//            if (busyBoardIndexes.at(j) == rotatedPieceBoardIndexes.at(i))
-//            {
-//                break;
-//            }
-//        }
-
-    //    }
+    //can't rotate when out of bounds
+    if (m_dynamicPieceBoardState != -1)
+        return false;
+    //check for empty spot after rotation
+    else
+    {
+        for (int i = 0; i < m_dynamicPiece.size(); i++)
+        {
+            if (m_dynamicPiece.at(i) != TRANSPARENT && m_dynamicPiece.at(i) != OUT_OF_BOARD)
+            {
+                switch(i)
+                {
+                case 0 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(3)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 1 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(7)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 2 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(11)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 3 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(15)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 4 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(2)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 5 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(6)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 6 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(10)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 7 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(14)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 8 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(1)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 9 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(5)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 10 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(9)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 11 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(13)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 12 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(0)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 13 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(4)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 14 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(8)) != BLACK)
+                        return false;
+                    break;
+                }
+                case 15 :
+                {
+                    if (m_board.at(getBoardIndexFromPieceIndex(12)) != BLACK)
+                        return false;
+                    break;
+                }
+                }
+            }
+        }
+        return true;
+    }
 }
 void CoreLogic::updateLeftOutOfBoardPieceIndexes()
 {
+    for (int i = 0; i < m_dynamicPiece.size(); i++)
+    {
+        if (m_dynamicPiece.at(i) == OUT_OF_BOARD)
+        {
+            m_dynamicPiece.replace(i, TRANSPARENT);
+        }
+    }
     if ((getBoardIndexFromPieceIndex(0)+1) % TABLE_WIDTH == 0)
     {
         m_dynamicPiece.replace(0, OUT_OF_BOARD);
         m_dynamicPiece.replace(4, OUT_OF_BOARD);
         m_dynamicPiece.replace(8, OUT_OF_BOARD);
         m_dynamicPiece.replace(12, OUT_OF_BOARD);
+        m_dynamicPieceBoardState = 3;
     }
     else if ((getBoardIndexFromPieceIndex(1)+1) % TABLE_WIDTH == 0)
     {
@@ -500,6 +927,7 @@ void CoreLogic::updateLeftOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(5, OUT_OF_BOARD);
         m_dynamicPiece.replace(9, OUT_OF_BOARD);
         m_dynamicPiece.replace(13, OUT_OF_BOARD);
+        m_dynamicPieceBoardState = 2;
     }
     else if ((getBoardIndexFromPieceIndex(2)+1) % TABLE_WIDTH == 0)
     {
@@ -515,6 +943,7 @@ void CoreLogic::updateLeftOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(6, OUT_OF_BOARD);
         m_dynamicPiece.replace(10, OUT_OF_BOARD);
         m_dynamicPiece.replace(14, OUT_OF_BOARD);
+        m_dynamicPieceBoardState = 1;
     }
     else if ((getBoardIndexFromPieceIndex(3)+1) % TABLE_WIDTH == 0)
     {
@@ -534,6 +963,18 @@ void CoreLogic::updateLeftOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(7, OUT_OF_BOARD);
         m_dynamicPiece.replace(11, OUT_OF_BOARD);
         m_dynamicPiece.replace(15, OUT_OF_BOARD);
+        m_dynamicPieceBoardState = 0;
+    }
+    else
+    {
+        m_dynamicPieceBoardState = -1;
+        for (int i = 0; i < m_dynamicPiece.size(); i++)
+        {
+            if (m_dynamicPiece.at(i) == OUT_OF_BOARD)
+            {
+                m_dynamicPiece.replace(i, TRANSPARENT);
+            }
+        }
     }
     for (int i = 0; i < m_dynamicPiece.size(); i++)
     {
@@ -544,12 +985,20 @@ void CoreLogic::updateLeftOutOfBoardPieceIndexes()
 }
 void CoreLogic::updateRightOutOfBoardPieceIndexes()
 {
-    if ((getBoardIndexFromPieceIndex(3)) % TABLE_WIDTH == 0)
+    for (int i = 0; i < m_dynamicPiece.size(); i++)
+    {
+        if (m_dynamicPiece.at(i) == OUT_OF_BOARD)
+        {
+            m_dynamicPiece.replace(i, TRANSPARENT);
+        }
+    }
+    if (getBoardIndexFromPieceIndex(3) % TABLE_WIDTH == 0)
     {
         m_dynamicPiece.replace(3, OUT_OF_BOARD);
         m_dynamicPiece.replace(7, OUT_OF_BOARD);
         m_dynamicPiece.replace(11, OUT_OF_BOARD);
         m_dynamicPiece.replace(15, OUT_OF_BOARD);
+        m_dynamicPieceBoardState = 4;
     }
     else if ((getBoardIndexFromPieceIndex(2)) % TABLE_WIDTH == 0)
     {
@@ -561,6 +1010,7 @@ void CoreLogic::updateRightOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(6, OUT_OF_BOARD);
         m_dynamicPiece.replace(10, OUT_OF_BOARD);
         m_dynamicPiece.replace(14, OUT_OF_BOARD);
+        m_dynamicPieceBoardState = 5;
     }
     else if ((getBoardIndexFromPieceIndex(1)) % TABLE_WIDTH == 0)
     {
@@ -576,6 +1026,7 @@ void CoreLogic::updateRightOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(5, OUT_OF_BOARD);
         m_dynamicPiece.replace(9, OUT_OF_BOARD);
         m_dynamicPiece.replace(13, OUT_OF_BOARD);
+        m_dynamicPieceBoardState = 6;
     }
     else if ((getBoardIndexFromPieceIndex(0)) % TABLE_WIDTH == 0)
     {
@@ -595,6 +1046,18 @@ void CoreLogic::updateRightOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(4, OUT_OF_BOARD);
         m_dynamicPiece.replace(8, OUT_OF_BOARD);
         m_dynamicPiece.replace(12, OUT_OF_BOARD);
+        m_dynamicPieceBoardState = 7;
+    }
+    else
+    {
+        m_dynamicPieceBoardState = -1;
+        for (int i = 0; i < m_dynamicPiece.size(); i++)
+        {
+            if (m_dynamicPiece.at(i) == OUT_OF_BOARD)
+            {
+                m_dynamicPiece.replace(i, TRANSPARENT);
+            }
+        }
     }
     for (int i = 0; i < m_dynamicPiece.size(); i++)
     {
@@ -628,6 +1091,10 @@ void CoreLogic::rotatePiece()
     m_dynamicPiece.replace(10, m_dynamicPiece.at(6));
     m_dynamicPiece.replace(6, color);
 
+    setLeftMostPiecesIndexes();
+    setRightMostPiecesIndexes();
+    setDownMostPiecesIndexes();
+
     emit dynamicPieceChanged();
 }
 void CoreLogic::movePieceDown()
@@ -637,15 +1104,75 @@ void CoreLogic::movePieceDown()
 void CoreLogic::movePieceRight()
 {
     setPieceX(m_pieceX + 15);
-    updateRightOutOfBoardPieceIndexes();
+    if (m_dynamicPieceBoardState == -1 || m_dynamicPieceBoardState > 3)
+    {
+        updateRightOutOfBoardPieceIndexes();
+    }
+    else if (m_dynamicPieceBoardState == 2)
+    {
+        if (m_dynamicPiece.at(2) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(2, TRANSPARENT);
+        if (m_dynamicPiece.at(6) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(6, TRANSPARENT);
+        if (m_dynamicPiece.at(10) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(10, TRANSPARENT);
+        if (m_dynamicPiece.at(14) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(14, TRANSPARENT);
+        m_dynamicPieceBoardState = 3;
+    }
+    else if (m_dynamicPieceBoardState == 3)
+    {
+        if (m_dynamicPiece.at(1) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(1, TRANSPARENT);
+        if (m_dynamicPiece.at(5) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(5, TRANSPARENT);
+        if (m_dynamicPiece.at(9) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(9, TRANSPARENT);
+        if (m_dynamicPiece.at(13) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(13, TRANSPARENT);
+        m_dynamicPieceBoardState = -1;
+    }
+    emit dynamicPieceChanged();
 }
 void CoreLogic::movePieceLeft()
 {
     setPieceX(m_pieceX - 15);
-    updateLeftOutOfBoardPieceIndexes();
+    if (m_dynamicPieceBoardState == -1 || m_dynamicPieceBoardState < 4)
+    {
+        updateLeftOutOfBoardPieceIndexes();
+    }
+    else if (m_dynamicPieceBoardState == 5)
+    {
+        if (m_dynamicPiece.at(1) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(1, TRANSPARENT);
+        if (m_dynamicPiece.at(5) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(5, TRANSPARENT);
+        if (m_dynamicPiece.at(9) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(9, TRANSPARENT);
+        if (m_dynamicPiece.at(13) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(13, TRANSPARENT);
+        m_dynamicPieceBoardState = 4;
+    }
+    else if (m_dynamicPieceBoardState == 4)
+    {
+        if (m_dynamicPiece.at(2) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(2, TRANSPARENT);
+        if (m_dynamicPiece.at(6) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(6, TRANSPARENT);
+        if (m_dynamicPiece.at(10) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(10, TRANSPARENT);
+        if (m_dynamicPiece.at(14) == OUT_OF_BOARD)
+            m_dynamicPiece.replace(14, TRANSPARENT);
+        m_dynamicPieceBoardState = -1;
+    }
+    emit dynamicPieceChanged();
 }
 void CoreLogic::resetPiece()
 {
+    //change piece
+    loadNewPiece();
+    emit dynamicPieceChanged();
+
     setPieceX(180);
     setPieceY(0);
 }
@@ -713,15 +1240,45 @@ void CoreLogic::setPieceY(double pieceY)
         emit pieceYChanged();
     }
 }
-QString CoreLogic::pieceColor() const
+int CoreLogic::gameLevel() const
 {
-    return m_pieceColor;
+    return m_gameLevel;
 }
-void CoreLogic::setPieceColor(QString color)
+void CoreLogic::setGameLevel(int level)
 {
-    if (color != m_pieceColor)
+    if (level == 1)
+        m_moveDownVelocity = 1000;
+    else if (level == 2)
+        m_moveDownVelocity = 500;
+    else if (level == 3)
+        m_moveDownVelocity = 250;
+    if (level != m_gameLevel)
     {
-        m_pieceColor = color;
-        emit pieceColorChanged();
+        m_gameLevel = level;
+        emit gameLevelChanged();
+    }
+}
+bool CoreLogic::dynamicPieceMovedDownOnce() const
+{
+    return m_dynamicPieceMovedDownOnce;
+}
+void CoreLogic::setDynamicPieceMovedDownOnce(bool trueOrFalse)
+{
+    if (trueOrFalse != m_dynamicPieceMovedDownOnce)
+    {
+        m_dynamicPieceMovedDownOnce = trueOrFalse;
+        emit dynamicPieceMovedDownOnceChanged();
+    }
+}
+bool CoreLogic::gameOver() const
+{
+    return m_gameOver;
+}
+void CoreLogic::setGameOver(bool trueOrFalse)
+{
+    if (trueOrFalse != m_gameOver)
+    {
+        m_gameOver = trueOrFalse;
+        emit gameOverChanged();
     }
 }
