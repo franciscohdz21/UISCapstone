@@ -17,6 +17,7 @@ class CoreLogic : public QTimer
     Q_PROPERTY(int gameLevel READ gameLevel WRITE setGameLevel NOTIFY gameLevelChanged)
     Q_PROPERTY(bool dynamicPieceMovedDownOnce READ dynamicPieceMovedDownOnce WRITE setDynamicPieceMovedDownOnce NOTIFY dynamicPieceMovedDownOnceChanged)
     Q_PROPERTY(bool gameOver READ gameOver WRITE setGameOver NOTIFY gameOverChanged)
+    Q_PROPERTY(int score READ score WRITE setScore NOTIFY scoreChanged)
 
 public:
     ~CoreLogic();
@@ -37,6 +38,8 @@ public:
     void setDynamicPieceMovedDownOnce(bool trueOrFalse);
     bool gameOver()const;
     void setGameOver(bool trueOrFalse);
+    int score()const;
+    void setScore(int score);
 
     //Other
     void init();
@@ -83,6 +86,7 @@ public:
     //Timer
     Q_INVOKABLE void startTimer();
     Q_INVOKABLE void stopTimer();
+    Q_INVOKABLE bool timerIsRunning();
 
 
 
@@ -94,6 +98,7 @@ signals:
     void gameLevelChanged();
     void dynamicPieceMovedDownOnceChanged();
     void gameOverChanged();
+    void scoreChanged();
 
 public slots:
     void gameRunning();
@@ -123,6 +128,7 @@ private:
     int m_gameLevel;
     bool m_dynamicPieceMovedDownOnce;
     bool m_gameOver;
+    int m_score;
 };
 
 #endif // CORELOGIC_H

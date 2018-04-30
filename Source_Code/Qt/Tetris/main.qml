@@ -21,12 +21,15 @@ Window {
     MessageDialog {
         id: gameOverMessageDialog
         title: "Game over."
-        text: "Thanks for playing!"
+        text: "Thanks for playing! Score: " + corelogic.score
         onAccepted: {
+            //reset game
+            easyRadioButton.checked = true
             corelogic.resetGame()
             startButton.state = ""
             startButtonText.state = ""
             corelogic.gameOver = false
+            corelogic.score = 0
         }
         visible: corelogic.gameOver
     }
@@ -45,7 +48,7 @@ Window {
             anchors.fill: parent
             focus: true
             Keys.onPressed: {
-                if (corelogic.canMoveDown() === true)
+                if (corelogic.canMoveDown() === true && corelogic.timerIsRunning() === true)
                 {
                     if (event.key === Qt.Key_Left) {
                         if (corelogic.canMoveLeft() === true)
@@ -64,7 +67,6 @@ Window {
                         if (corelogic.canRotate() === true)
                             corelogic.rotatePiece()
                     }
-
                     event.accepted = true;
                 }
             }
@@ -254,6 +256,15 @@ Window {
                                 color: "#17FF00"
                             }
                         }
+                    }
+
+                    Text {
+                        x: 50
+                        y: 420
+                        text: "Score:  " + corelogic.score
+                        font.family: "Courier"
+                        font.pixelSize: 14
+                        color: "#17FF00"
                     }
                 }
             }

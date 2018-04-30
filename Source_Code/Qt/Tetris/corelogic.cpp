@@ -38,8 +38,9 @@ CoreLogic &CoreLogic::Instance()
 }
 void CoreLogic::init()
 {
+    setScore(0);
+    setDynamicPieceMovedDownOnce(false);
     m_dynamicPieceBoardState = -1;
-    m_dynamicPieceMovedDownOnce = false;
     m_gameOver = false;
 
     //add colors
@@ -482,18 +483,28 @@ void CoreLogic::checkForCompleteRow()
     {
         for (int j = 0; j < TABLE_WIDTH; j++)
         {
-            //qDebug() << "Index: " << ((i*26)+j) <<  " Value: " << m_board.at((i*26)+j);
+            //break if non-black square is found
             if (m_board.at((i*26)+j) == BLACK)
             {
                 break;
             }
+            //otherwise, row is complete
             if (j == 25)
             {
+                //increment score
+                if (m_gameLevel == 1)
+                    setScore(m_score + 10);
+                else if (m_gameLevel == 2)
+                    setScore(m_score + 50);
+                else if (m_gameLevel == 3)
+                    setScore(m_score + 150);
+
+                //Paint entire row back to black
                 for (int k = 0; k < TABLE_WIDTH; k++)
                 {
                     m_board.replace(((i*26)+k), BLACK);
                 }
-                //Move rows
+                //Move rows down 1
                 for (int l = i; l != 0; l--)
                 {
                     for (int m = 0; m < TABLE_WIDTH; m++)
@@ -509,6 +520,7 @@ void CoreLogic::checkForCompleteRow()
             }
         }
     }
+    //update board
     emit boardChanged();
 }
 int CoreLogic::getCurrentPiece() const
@@ -578,7 +590,6 @@ void CoreLogic::setDownMostPiecesIndexes()
     //column 1
     for (int i = 12; i >= 0; i=i-4)
     {
-        qDebug () << i;
         if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
             m_downMostPiecesIndexes.push_back(i);
@@ -624,72 +635,42 @@ void CoreLogic::setLeftMostPiecesIndexes()
 {
     m_leftMostPiecesIndexes.clear();
     //row 1
-    for (int i = 12; i >= 0; i=i-4)
+    for (int i = 0; i <= 3; i++)
     {
-        qDebug () << i;
         if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
-            m_downMostPiecesIndexes.push_back(i);
+            m_leftMostPiecesIndexes.push_back(i);
             break;
         }
     }
 
     //row 2
-    for (int i = 13; i >= 1; i=i-4)
+    for (int i = 4; i <= 7; i++)
     {
         if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
-            m_downMostPiecesIndexes.push_back(i);
+            m_leftMostPiecesIndexes.push_back(i);
             break;
         }
     }
 
     //row 3
-    for (int i = 14; i >= 2; i=i-4)
+    for (int i = 8; i <= 11; i++)
     {
         if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
-            m_downMostPiecesIndexes.push_back(i);
+            m_leftMostPiecesIndexes.push_back(i);
             break;
         }
     }
 
     //row 4
-    for (int i = 15; i >= 3; i=i-4)
+    for (int i = 12; i <= 15; i++)
     {
         if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
-            m_downMostPiecesIndexes.push_back(i);
-            break;
-        }
-    }
-
-    bool colorPieceFound = false;
-    m_leftMostPiecesIndexes.clear();
-    for (int i = 0; i != 19; i=i+4)
-    {
-        if (i < 16 && i > -1 && m_dynamicPiece.at(i) != TRANSPARENT && m_dynamicPiece.at(i) != OUT_OF_BOARD)
-        {
-            colorPieceFound = true;
             m_leftMostPiecesIndexes.push_back(i);
-        }
-        if (i == 16)
-        {
-            if (colorPieceFound == true)
-                break;
-            i = -3;
-        }
-        else if (i == 17)
-        {
-            if (colorPieceFound == true)
-                break;
-            i = -2;
-        }
-        else if (i == 18)
-        {
-            if (colorPieceFound == true)
-                break;
-            i = -1;
+            break;
         }
     }
 }
@@ -699,32 +680,44 @@ QVector<int> CoreLogic::rightMostPiecesIndexes() const
 }
 void CoreLogic::setRightMostPiecesIndexes()
 {
-    bool colorPieceFound = false;
     m_rightMostPiecesIndexes.clear();
-    for (int i = 3; i != 16; i=i+4)
+    //row 1
+    for (int i = 3; i >= 0; i--)
     {
-        if (i < 16 && i > -1 && m_dynamicPiece.at(i) != TRANSPARENT && m_dynamicPiece.at(i) != OUT_OF_BOARD)
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
-            colorPieceFound = true;
             m_rightMostPiecesIndexes.push_back(i);
+            break;
         }
-        if (i == 19)
+    }
+
+    //row 2
+    for (int i = 7; i >= 4; i--)
+    {
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
-            if (colorPieceFound == true)
-                break;
-            i = -2;
+            m_rightMostPiecesIndexes.push_back(i);
+            break;
         }
-        else if (i == 18)
+    }
+
+    //row 3
+    for (int i = 11; i >= 8; i--)
+    {
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
-            if (colorPieceFound == true)
-                break;
-            i = -3;
+            m_rightMostPiecesIndexes.push_back(i);
+            break;
         }
-        else if (i == 17)
+    }
+
+    //row 4
+    for (int i = 15; i >= 12; i--)
+    {
+        if (m_dynamicPiece.at(i) != TRANSPARENT &&  m_dynamicPiece.at(i) != OUT_OF_BOARD)
         {
-            if (colorPieceFound == true)
-                break;
-            i = -4;
+            m_rightMostPiecesIndexes.push_back(i);
+            break;
         }
     }
 }
@@ -749,9 +742,11 @@ bool CoreLogic::canMoveRight()
     setRightMostPiecesIndexes();
     for (int i = 0; i < m_rightMostPiecesIndexes.size(); i++)
     {
-        qDebug () << getBoardIndexFromPieceIndex(m_rightMostPiecesIndexes.at(i))+1 % TABLE_WIDTH;
-
         if ((getBoardIndexFromPieceIndex(m_rightMostPiecesIndexes.at(i))+1) % TABLE_WIDTH == 0)
+        {
+            return false;
+        }
+        else if (m_board.at(getBoardIndexFromPieceIndex(m_rightMostPiecesIndexes.at(i)) + 1) != BLACK)
         {
             return false;
         }
@@ -770,15 +765,6 @@ bool CoreLogic::canMoveDown()
         }
         else if (m_board.at(getBoardIndexFromPieceIndex(m_downMostPiecesIndexes.at(i)) + TABLE_WIDTH) != BLACK)
         {
-            //game over
-            if (m_dynamicPieceMovedDownOnce == false)
-            {
-                stopTimer();
-                setGameOver(true);
-                return false;
-            }
-
-            //game continues
             return false;
         }
     }
@@ -1100,6 +1086,7 @@ void CoreLogic::rotatePiece()
 void CoreLogic::movePieceDown()
 {
     setPieceY(m_pieceY + 15);
+    setDynamicPieceMovedDownOnce(true);
 }
 void CoreLogic::movePieceRight()
 {
@@ -1175,10 +1162,29 @@ void CoreLogic::resetPiece()
 
     setPieceX(180);
     setPieceY(0);
+
+    //check for game over
+    if ((m_dynamicPieceMovedDownOnce == false) && (canMoveDown() == false))
+    {
+        stopTimer();
+        setGameOver(true);
+    }
+
+    //increment score
+    if (m_gameLevel == 1)
+        setScore(m_score + 1);
+    else if (m_gameLevel == 2)
+        setScore(m_score + 5);
+    else if (m_gameLevel == 3)
+        setScore(m_score + 15);
 }
 void CoreLogic::stopTimer()
 {
     m_timer->stop();
+}
+bool CoreLogic::timerIsRunning()
+{
+    return m_timer->isActive();
 }
 void CoreLogic::startTimer()
 {
@@ -1280,5 +1286,17 @@ void CoreLogic::setGameOver(bool trueOrFalse)
     {
         m_gameOver = trueOrFalse;
         emit gameOverChanged();
+    }
+}
+int CoreLogic::score() const
+{
+    return m_score;
+}
+void CoreLogic::setScore(int score)
+{
+    if (score != m_score)
+    {
+        m_score = score;
+        emit scoreChanged();
     }
 }

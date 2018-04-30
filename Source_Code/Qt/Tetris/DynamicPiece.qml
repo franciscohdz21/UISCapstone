@@ -10,15 +10,14 @@ Component {
         property bool movedDownOnce: corelogic.dynamicPieceMovedDownOnce
 
         onYChanged: {
-            corelogic.dynamicPieceMovedDownOnce = true
             if (corelogic.canMoveDown() === false)
             {
                 loader.sourceComponent = undefined
+                corelogic.dynamicPieceMovedDownOnce = false
                 corelogic.setPieceAtBoard()
                 corelogic.checkForCompleteRow()
                 corelogic.resetPiece()
                 loader.sourceComponent = dynamicPiece
-                corelogic.dynamicPieceMovedDownOnce = false
             }
         }
         Rectangle {
@@ -33,7 +32,7 @@ Component {
                 if ((corelogic.dynamicPiece[0] === "transparent") || (corelogic.dynamicPiece[0] === "OUT OF BOARD"))
                     return "transparent"
                 else
-                    return "black"
+                    return "blue"
             }
         }
         Rectangle {
