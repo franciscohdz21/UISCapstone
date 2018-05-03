@@ -1,3 +1,0 @@
-﻿  MyForm1.cpp
-MyForm1.cpp(9): warning C4829: Possibly incorrect parameters to function main. Consider 'int main(Platform::Array<Platform::String^>^ argv)'
-  Project3.vcxproj -> C:\Users\jtiel\Desktop\Form Test\Project3\Debug\Project3.exe
