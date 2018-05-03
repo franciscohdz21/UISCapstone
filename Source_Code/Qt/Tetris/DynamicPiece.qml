@@ -20,6 +20,7 @@ Component {
                 loader.sourceComponent = dynamicPiece
             }
         }
+
         Rectangle {
             id: piece1
             anchors.top: parent.top
@@ -32,7 +33,7 @@ Component {
                 if ((corelogic.dynamicPiece[0] === "transparent") || (corelogic.dynamicPiece[0] === "OUT OF BOARD"))
                     return "transparent"
                 else
-                    return "blue"
+                    return "black"
             }
         }
         Rectangle {
@@ -74,9 +75,7 @@ Component {
             color: corelogic.dynamicPiece[3]
             border.width: 1
             border.color: {
-//                if ((corelogic.dynamicPiece[3] === "transparent"))
-//                    return "transparent"
-                if ((corelogic.dynamicPiece[3] === "OUT OF BOARD"))
+                if ((corelogic.dynamicPiece[3] === "transparent") || (corelogic.dynamicPiece[3] === "OUT OF BOARD"))
                     return "transparent"
                 else
                     return "black"
