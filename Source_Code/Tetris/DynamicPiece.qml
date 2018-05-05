@@ -1,5 +1,11 @@
 import QtQuick 2.0
 
+
+/*
+ * Moving shape
+ * Made up of 16 individual squares that get updated as
+ * shape moves/rotates.
+ */
 Component {
     Item {
         id: dynamicPieceItem
@@ -8,7 +14,6 @@ Component {
         x: corelogic.pieceX
         y: corelogic.pieceY
         property bool movedDownOnce: corelogic.dynamicPieceMovedDownOnce
-
         onYChanged: {
             if (corelogic.canMoveDown() === false)
             {

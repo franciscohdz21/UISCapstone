@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_CoreLogic_t {
-    QByteArrayData data[41];
-    char stringdata0[513];
+    QByteArrayData data[38];
+    char stringdata0[475];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -47,31 +47,28 @@ QT_MOC_LITERAL(12, 177, 1), // "x"
 QT_MOC_LITERAL(13, 179, 1), // "y"
 QT_MOC_LITERAL(14, 181, 15), // "setPieceAtBoard"
 QT_MOC_LITERAL(15, 197, 19), // "checkForCompleteRow"
-QT_MOC_LITERAL(16, 217, 15), // "getCurrentPiece"
-QT_MOC_LITERAL(17, 233, 15), // "setCurrentPiece"
-QT_MOC_LITERAL(18, 249, 5), // "piece"
-QT_MOC_LITERAL(19, 255, 9), // "resetGame"
-QT_MOC_LITERAL(20, 265, 14), // "getRandomColor"
-QT_MOC_LITERAL(21, 280, 11), // "canMoveLeft"
-QT_MOC_LITERAL(22, 292, 12), // "canMoveRight"
-QT_MOC_LITERAL(23, 305, 11), // "canMoveDown"
-QT_MOC_LITERAL(24, 317, 9), // "canRotate"
-QT_MOC_LITERAL(25, 327, 11), // "rotatePiece"
-QT_MOC_LITERAL(26, 339, 13), // "movePieceDown"
-QT_MOC_LITERAL(27, 353, 14), // "movePieceRight"
-QT_MOC_LITERAL(28, 368, 13), // "movePieceLeft"
-QT_MOC_LITERAL(29, 382, 10), // "resetPiece"
-QT_MOC_LITERAL(30, 393, 10), // "startTimer"
-QT_MOC_LITERAL(31, 404, 9), // "stopTimer"
-QT_MOC_LITERAL(32, 414, 14), // "timerIsRunning"
-QT_MOC_LITERAL(33, 429, 5), // "board"
-QT_MOC_LITERAL(34, 435, 12), // "dynamicPiece"
-QT_MOC_LITERAL(35, 448, 6), // "pieceX"
-QT_MOC_LITERAL(36, 455, 6), // "pieceY"
-QT_MOC_LITERAL(37, 462, 9), // "gameLevel"
-QT_MOC_LITERAL(38, 472, 25), // "dynamicPieceMovedDownOnce"
-QT_MOC_LITERAL(39, 498, 8), // "gameOver"
-QT_MOC_LITERAL(40, 507, 5) // "score"
+QT_MOC_LITERAL(16, 217, 9), // "resetGame"
+QT_MOC_LITERAL(17, 227, 14), // "getRandomColor"
+QT_MOC_LITERAL(18, 242, 11), // "canMoveLeft"
+QT_MOC_LITERAL(19, 254, 12), // "canMoveRight"
+QT_MOC_LITERAL(20, 267, 11), // "canMoveDown"
+QT_MOC_LITERAL(21, 279, 9), // "canRotate"
+QT_MOC_LITERAL(22, 289, 11), // "rotatePiece"
+QT_MOC_LITERAL(23, 301, 13), // "movePieceDown"
+QT_MOC_LITERAL(24, 315, 14), // "movePieceRight"
+QT_MOC_LITERAL(25, 330, 13), // "movePieceLeft"
+QT_MOC_LITERAL(26, 344, 10), // "resetPiece"
+QT_MOC_LITERAL(27, 355, 10), // "startTimer"
+QT_MOC_LITERAL(28, 366, 9), // "stopTimer"
+QT_MOC_LITERAL(29, 376, 14), // "timerIsRunning"
+QT_MOC_LITERAL(30, 391, 5), // "board"
+QT_MOC_LITERAL(31, 397, 12), // "dynamicPiece"
+QT_MOC_LITERAL(32, 410, 6), // "pieceX"
+QT_MOC_LITERAL(33, 417, 6), // "pieceY"
+QT_MOC_LITERAL(34, 424, 9), // "gameLevel"
+QT_MOC_LITERAL(35, 434, 25), // "dynamicPieceMovedDownOnce"
+QT_MOC_LITERAL(36, 460, 8), // "gameOver"
+QT_MOC_LITERAL(37, 469, 5) // "score"
 
     },
     "CoreLogic\0boardChanged\0\0pieceXChanged\0"
@@ -79,8 +76,7 @@ QT_MOC_LITERAL(40, 507, 5) // "score"
     "gameLevelChanged\0dynamicPieceMovedDownOnceChanged\0"
     "gameOverChanged\0scoreChanged\0gameRunning\0"
     "getBoardIndex\0x\0y\0setPieceAtBoard\0"
-    "checkForCompleteRow\0getCurrentPiece\0"
-    "setCurrentPiece\0piece\0resetGame\0"
+    "checkForCompleteRow\0resetGame\0"
     "getRandomColor\0canMoveLeft\0canMoveRight\0"
     "canMoveDown\0canRotate\0rotatePiece\0"
     "movePieceDown\0movePieceRight\0movePieceLeft\0"
@@ -98,46 +94,44 @@ static const uint qt_meta_data_CoreLogic[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      28,   14, // methods
-       8,  188, // properties
+      26,   14, // methods
+       8,  174, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        8,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,  154,    2, 0x06 /* Public */,
-       3,    0,  155,    2, 0x06 /* Public */,
-       4,    0,  156,    2, 0x06 /* Public */,
-       5,    0,  157,    2, 0x06 /* Public */,
-       6,    0,  158,    2, 0x06 /* Public */,
-       7,    0,  159,    2, 0x06 /* Public */,
-       8,    0,  160,    2, 0x06 /* Public */,
-       9,    0,  161,    2, 0x06 /* Public */,
+       1,    0,  144,    2, 0x06 /* Public */,
+       3,    0,  145,    2, 0x06 /* Public */,
+       4,    0,  146,    2, 0x06 /* Public */,
+       5,    0,  147,    2, 0x06 /* Public */,
+       6,    0,  148,    2, 0x06 /* Public */,
+       7,    0,  149,    2, 0x06 /* Public */,
+       8,    0,  150,    2, 0x06 /* Public */,
+       9,    0,  151,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      10,    0,  162,    2, 0x0a /* Public */,
+      10,    0,  152,    2, 0x0a /* Public */,
 
  // methods: name, argc, parameters, tag, flags
-      11,    2,  163,    2, 0x02 /* Public */,
-      14,    0,  168,    2, 0x02 /* Public */,
-      15,    0,  169,    2, 0x02 /* Public */,
-      16,    0,  170,    2, 0x02 /* Public */,
-      17,    1,  171,    2, 0x02 /* Public */,
-      19,    0,  174,    2, 0x02 /* Public */,
-      20,    0,  175,    2, 0x02 /* Public */,
-      21,    0,  176,    2, 0x02 /* Public */,
-      22,    0,  177,    2, 0x02 /* Public */,
-      23,    0,  178,    2, 0x02 /* Public */,
-      24,    0,  179,    2, 0x02 /* Public */,
-      25,    0,  180,    2, 0x02 /* Public */,
-      26,    0,  181,    2, 0x02 /* Public */,
-      27,    0,  182,    2, 0x02 /* Public */,
-      28,    0,  183,    2, 0x02 /* Public */,
-      29,    0,  184,    2, 0x02 /* Public */,
-      30,    0,  185,    2, 0x02 /* Public */,
-      31,    0,  186,    2, 0x02 /* Public */,
-      32,    0,  187,    2, 0x02 /* Public */,
+      11,    2,  153,    2, 0x02 /* Public */,
+      14,    0,  158,    2, 0x02 /* Public */,
+      15,    0,  159,    2, 0x02 /* Public */,
+      16,    0,  160,    2, 0x02 /* Public */,
+      17,    0,  161,    2, 0x02 /* Public */,
+      18,    0,  162,    2, 0x02 /* Public */,
+      19,    0,  163,    2, 0x02 /* Public */,
+      20,    0,  164,    2, 0x02 /* Public */,
+      21,    0,  165,    2, 0x02 /* Public */,
+      22,    0,  166,    2, 0x02 /* Public */,
+      23,    0,  167,    2, 0x02 /* Public */,
+      24,    0,  168,    2, 0x02 /* Public */,
+      25,    0,  169,    2, 0x02 /* Public */,
+      26,    0,  170,    2, 0x02 /* Public */,
+      27,    0,  171,    2, 0x02 /* Public */,
+      28,    0,  172,    2, 0x02 /* Public */,
+      29,    0,  173,    2, 0x02 /* Public */,
 
  // signals: parameters
     QMetaType::Void,
@@ -156,8 +150,6 @@ static const uint qt_meta_data_CoreLogic[] = {
     QMetaType::Int, QMetaType::Double, QMetaType::Double,   12,   13,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Int,
-    QMetaType::Void, QMetaType::Int,   18,
     QMetaType::Void,
     QMetaType::QString,
     QMetaType::Bool,
@@ -174,14 +166,14 @@ static const uint qt_meta_data_CoreLogic[] = {
     QMetaType::Bool,
 
  // properties: name, type, flags
-      33, QMetaType::QStringList, 0x00495103,
-      34, QMetaType::QStringList, 0x00495103,
-      35, QMetaType::Double, 0x00495103,
-      36, QMetaType::Double, 0x00495103,
+      30, QMetaType::QStringList, 0x00495103,
+      31, QMetaType::QStringList, 0x00495103,
+      32, QMetaType::Double, 0x00495103,
+      33, QMetaType::Double, 0x00495103,
+      34, QMetaType::Int, 0x00495103,
+      35, QMetaType::Bool, 0x00495103,
+      36, QMetaType::Bool, 0x00495103,
       37, QMetaType::Int, 0x00495103,
-      38, QMetaType::Bool, 0x00495103,
-      39, QMetaType::Bool, 0x00495103,
-      40, QMetaType::Int, 0x00495103,
 
  // properties: notify_signal_id
        0,
@@ -215,28 +207,25 @@ void CoreLogic::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
         case 10: _t->setPieceAtBoard(); break;
         case 11: _t->checkForCompleteRow(); break;
-        case 12: { int _r = _t->getCurrentPiece();
-            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 13: _t->setCurrentPiece((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 14: _t->resetGame(); break;
-        case 15: { QString _r = _t->getRandomColor();
+        case 12: _t->resetGame(); break;
+        case 13: { QString _r = _t->getRandomColor();
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
-        case 16: { bool _r = _t->canMoveLeft();
+        case 14: { bool _r = _t->canMoveLeft();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 17: { bool _r = _t->canMoveRight();
+        case 15: { bool _r = _t->canMoveRight();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 18: { bool _r = _t->canMoveDown();
+        case 16: { bool _r = _t->canMoveDown();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 19: { bool _r = _t->canRotate();
+        case 17: { bool _r = _t->canRotate();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 20: _t->rotatePiece(); break;
-        case 21: _t->movePieceDown(); break;
-        case 22: _t->movePieceRight(); break;
-        case 23: _t->movePieceLeft(); break;
-        case 24: _t->resetPiece(); break;
-        case 25: _t->startTimer(); break;
-        case 26: _t->stopTimer(); break;
-        case 27: { bool _r = _t->timerIsRunning();
+        case 18: _t->rotatePiece(); break;
+        case 19: _t->movePieceDown(); break;
+        case 20: _t->movePieceRight(); break;
+        case 21: _t->movePieceLeft(); break;
+        case 22: _t->resetPiece(); break;
+        case 23: _t->startTimer(); break;
+        case 24: _t->stopTimer(); break;
+        case 25: { bool _r = _t->timerIsRunning();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
@@ -360,13 +349,13 @@ int CoreLogic::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 28)
+        if (_id < 26)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 28;
+        _id -= 26;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 28)
+        if (_id < 26)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 28;
+        _id -= 26;
     }
 #ifndef QT_NO_PROPERTIES
    else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty

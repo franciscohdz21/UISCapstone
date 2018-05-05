@@ -5,6 +5,7 @@ import QtQuick.Controls 2.3
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.3
 
+//Main window
 Window {
     visible: true
     width: 965
@@ -18,6 +19,7 @@ Window {
         loader.sourceComponent = dynamicPiece;
     }
 
+    //Game over message dialog
     MessageDialog {
         id: gameOverMessageDialog
         title: "Game over."
@@ -34,15 +36,18 @@ Window {
         visible: corelogic.gameOver
     }
 
+    //Rectangle filling the window
     Rectangle {
         anchors.fill: parent
         color: "black"
 
+        //Making recangle listen to mouse clicks
         MouseArea {
             id: outerMostMouseArea
             anchors.fill: parent
             hoverEnabled: true
         }
+        //Keys pressed handling
         Item {
             id: keysPressedItem
             anchors.fill: parent
@@ -72,10 +77,12 @@ Window {
             }
         }
 
+        //Column layout that contains the 3 rectangles displayed on application
         ColumnLayout {
             id: columnLayout
             spacing: 20
 
+            //Row layout displaying names of developers
             RowLayout {
                 id: mainRowLayout
                 anchors.fill: parent
@@ -125,6 +132,8 @@ Window {
                         font.pixelSize: 14
                     }
                 }
+
+                //Middle rectangle - where the game is played and the shapes move
                 Rectangle {
                     id: middleRectangle
                     height: 570
@@ -147,15 +156,19 @@ Window {
                         anchors.topMargin: 15
                         border.color: "#17FF00"
 
+                        //Grid to easily organzied squares in board
                         Grid {
                             id: grid
                             x: 0
                             y: 0
                             columns: 26
                             spacing: 0
+                            //Clone single rectangle throughout the board
                             Repeater {
                                 id: pieceRepeater
+                                //important = model contains the data which exists in C++ back-end
                                 model: corelogic.board
+                                //Single rectangle piece
                                 Rectangle {
                                     id: piece
                                     width: 15; height: 15
@@ -170,15 +183,18 @@ Window {
                                 }
                             }
                         }
+                        //To create/destroy moving shape dynamically
                         Loader {
                             id: loader
                         }
+                        //General moving shape
                         DynamicPiece {
                             id: dynamicPiece
                         }
                     }
 
                 }
+                //Right rectangle that contains difficulty and score
                 Rectangle {
                     id: rightRectangle
                     height: 550
@@ -283,6 +299,7 @@ Window {
                     color: "#32CD32"
                 }
 
+                //Start button enhanced with "Start" and "Pause" states
                 Button {
                     id: startButton
                     anchors.left: parent.left

@@ -38,6 +38,7 @@ CoreLogic &CoreLogic::Instance()
 }
 void CoreLogic::init()
 {
+    //set some necessary initial values
     setScore(0);
     setDynamicPieceMovedDownOnce(false);
     m_dynamicPieceBoardState = -1;
@@ -54,7 +55,7 @@ void CoreLogic::init()
     m_listOfColors.push_back(GREY);
     m_listOfColors.push_back(WHITE);
 
-    //set game level
+    //set game level and move down velocity
     m_gameLevel = 1;
     if (m_gameLevel == 1)
         m_moveDownVelocity = 1000;
@@ -67,7 +68,7 @@ void CoreLogic::init()
     buildPieces();
     loadNewPiece();
 
-    //init timer
+    //init and connect timer
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(gameRunning()));
 
@@ -426,11 +427,15 @@ void CoreLogic::buildHardPieces()
 }
 int CoreLogic::getBoardIndex(double x, double y)
 {
+    //algorithm used to return proper index
     return (x/15) + (y/15 * TABLE_WIDTH);
 }
 int CoreLogic::getBoardIndexFromPieceIndex(int pieceIndex)
 {
+    //first index of shape
     double firstIndex = (m_pieceX/15) + (m_pieceY/15 * TABLE_WIDTH);
+
+    //add indexes accordingly
     if (pieceIndex == 0)
         return firstIndex;
     else if (pieceIndex == 1)
@@ -468,6 +473,8 @@ int CoreLogic::getBoardIndexFromPieceIndex(int pieceIndex)
 }
 void CoreLogic::setPieceAtBoard()
 {
+    //iterate shape and set each item that is not transparent and out of board
+    //in board
     for (int i = 0; i < m_dynamicPiece.size(); i++)
     {
         if (m_dynamicPiece.at(i) != TRANSPARENT && m_dynamicPiece.at(i) != OUT_OF_BOARD)
@@ -499,12 +506,12 @@ void CoreLogic::checkForCompleteRow()
                 else if (m_gameLevel == 3)
                     setScore(m_score + 150);
 
-                //Paint entire row back to black
+                //paint entire row back to black
                 for (int k = 0; k < TABLE_WIDTH; k++)
                 {
                     m_board.replace(((i*26)+k), BLACK);
                 }
-                //Move rows down 1
+                //move rows down 1
                 for (int l = i; l != 0; l--)
                 {
                     for (int m = 0; m < TABLE_WIDTH; m++)
@@ -512,7 +519,7 @@ void CoreLogic::checkForCompleteRow()
                         m_board.replace(((l*26)+m), m_board.value(((l-1)*26)+m));
                     }
                 }
-                //Set upper row to black
+                //set upper row to black
                 for (int m = 0; m < TABLE_WIDTH; m++)
                 {
                     m_board.replace(m, BLACK);
@@ -522,14 +529,6 @@ void CoreLogic::checkForCompleteRow()
     }
     //update board
     emit boardChanged();
-}
-int CoreLogic::getCurrentPiece() const
-{
-    return m_currentPiece;
-}
-void CoreLogic::setCurrentPiece(int piece)
-{
-    m_currentPiece = piece;
 }
 void CoreLogic::loadNewPiece()
 {
@@ -549,6 +548,8 @@ void CoreLogic::loadNewPiece()
         if (m_dynamicPiece.at(i) == "color")
             m_dynamicPiece.replace(i, getRandomColor());
     }
+
+    //update shape
     emit dynamicPieceChanged();
 }
 int CoreLogic::getRandomNumber(int range)
@@ -565,7 +566,10 @@ void CoreLogic::resetGame()
 }
 void CoreLogic::resetBoard()
 {
+    //clear
     m_board.clear();
+
+    //fill with black
     for (auto i = 0; i < (TABLE_HEIGHT*TABLE_WIDTH); i++)
     {
         m_board.push_back(BLACK);
@@ -586,7 +590,9 @@ QVector<int> CoreLogic::downMostPiecesIndexes() const
 }
 void CoreLogic::setDownMostPiecesIndexes()
 {
+    //clear
     m_downMostPiecesIndexes.clear();
+
     //column 1
     for (int i = 12; i >= 0; i=i-4)
     {
@@ -724,12 +730,15 @@ void CoreLogic::setRightMostPiecesIndexes()
 bool CoreLogic::canMoveLeft()
 {
     setLeftMostPiecesIndexes();
+
     for (int i = 0; i < m_leftMostPiecesIndexes.size(); i++)
     {
+        //return false if adjacent to left bound
         if (getBoardIndexFromPieceIndex(m_leftMostPiecesIndexes.at(i)) % TABLE_WIDTH == 0)
         {
             return false;
         }
+        //return false if adjacent to a non-black square
         else if (m_board.at(getBoardIndexFromPieceIndex(m_leftMostPiecesIndexes.at(i)) - 1) != BLACK)
         {
             return false;
@@ -740,12 +749,15 @@ bool CoreLogic::canMoveLeft()
 bool CoreLogic::canMoveRight()
 {
     setRightMostPiecesIndexes();
+
     for (int i = 0; i < m_rightMostPiecesIndexes.size(); i++)
     {
+        //return false if adjacent to right bound
         if ((getBoardIndexFromPieceIndex(m_rightMostPiecesIndexes.at(i))+1) % TABLE_WIDTH == 0)
         {
             return false;
         }
+        //return false if adjacent to a non-black square
         else if (m_board.at(getBoardIndexFromPieceIndex(m_rightMostPiecesIndexes.at(i)) + 1) != BLACK)
         {
             return false;
@@ -756,13 +768,15 @@ bool CoreLogic::canMoveRight()
 bool CoreLogic::canMoveDown()
 {
     setDownMostPiecesIndexes();  
-    //check bouds
+
     for (int i = 0; i < m_downMostPiecesIndexes.size(); i++)
     {
+        //return false if located at down most rown
         if (getBoardIndexFromPieceIndex(m_downMostPiecesIndexes.at(i)) > 909)
         {
             return false;
         }
+        //return false if adjacent to a non-black square
         else if (m_board.at(getBoardIndexFromPieceIndex(m_downMostPiecesIndexes.at(i)) + TABLE_WIDTH) != BLACK)
         {
             return false;
@@ -775,6 +789,7 @@ bool CoreLogic::canRotate()
     //can't rotate when out of bounds
     if (m_dynamicPieceBoardState != -1)
         return false;
+
     //check for empty spot after rotation
     else
     {
@@ -888,6 +903,7 @@ bool CoreLogic::canRotate()
 }
 void CoreLogic::updateLeftOutOfBoardPieceIndexes()
 {
+    //reset out of board to transparent
     for (int i = 0; i < m_dynamicPiece.size(); i++)
     {
         if (m_dynamicPiece.at(i) == OUT_OF_BOARD)
@@ -895,6 +911,7 @@ void CoreLogic::updateLeftOutOfBoardPieceIndexes()
             m_dynamicPiece.replace(i, TRANSPARENT);
         }
     }
+    //check first column of dynamic shape
     if ((getBoardIndexFromPieceIndex(0)+1) % TABLE_WIDTH == 0)
     {
         m_dynamicPiece.replace(0, OUT_OF_BOARD);
@@ -903,6 +920,7 @@ void CoreLogic::updateLeftOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(12, OUT_OF_BOARD);
         m_dynamicPieceBoardState = 3;
     }
+    //check second column of dynamic shape
     else if ((getBoardIndexFromPieceIndex(1)+1) % TABLE_WIDTH == 0)
     {
         m_dynamicPiece.replace(0, OUT_OF_BOARD);
@@ -915,6 +933,7 @@ void CoreLogic::updateLeftOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(13, OUT_OF_BOARD);
         m_dynamicPieceBoardState = 2;
     }
+    //check third column of dynamic shape
     else if ((getBoardIndexFromPieceIndex(2)+1) % TABLE_WIDTH == 0)
     {
         m_dynamicPiece.replace(0, OUT_OF_BOARD);
@@ -931,6 +950,7 @@ void CoreLogic::updateLeftOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(14, OUT_OF_BOARD);
         m_dynamicPieceBoardState = 1;
     }
+    //check fourth column of dynamic shape
     else if ((getBoardIndexFromPieceIndex(3)+1) % TABLE_WIDTH == 0)
     {
         m_dynamicPiece.replace(0, OUT_OF_BOARD);
@@ -951,6 +971,7 @@ void CoreLogic::updateLeftOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(15, OUT_OF_BOARD);
         m_dynamicPieceBoardState = 0;
     }
+    //otherwise, shape is entirely inside board
     else
     {
         m_dynamicPieceBoardState = -1;
@@ -962,15 +983,10 @@ void CoreLogic::updateLeftOutOfBoardPieceIndexes()
             }
         }
     }
-    for (int i = 0; i < m_dynamicPiece.size(); i++)
-    {
-        qDebug () << m_dynamicPiece.at(i);
-    }
-    qDebug () << "---------";
-
 }
 void CoreLogic::updateRightOutOfBoardPieceIndexes()
 {
+    //reset out of board to transparent
     for (int i = 0; i < m_dynamicPiece.size(); i++)
     {
         if (m_dynamicPiece.at(i) == OUT_OF_BOARD)
@@ -978,6 +994,7 @@ void CoreLogic::updateRightOutOfBoardPieceIndexes()
             m_dynamicPiece.replace(i, TRANSPARENT);
         }
     }
+    //check fourth column of dynamic shape
     if (getBoardIndexFromPieceIndex(3) % TABLE_WIDTH == 0)
     {
         m_dynamicPiece.replace(3, OUT_OF_BOARD);
@@ -986,6 +1003,7 @@ void CoreLogic::updateRightOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(15, OUT_OF_BOARD);
         m_dynamicPieceBoardState = 4;
     }
+    //check third column of dynamic shape
     else if ((getBoardIndexFromPieceIndex(2)) % TABLE_WIDTH == 0)
     {
         m_dynamicPiece.replace(3, OUT_OF_BOARD);
@@ -998,6 +1016,7 @@ void CoreLogic::updateRightOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(14, OUT_OF_BOARD);
         m_dynamicPieceBoardState = 5;
     }
+    //check second column of dynamic shape
     else if ((getBoardIndexFromPieceIndex(1)) % TABLE_WIDTH == 0)
     {
         m_dynamicPiece.replace(3, OUT_OF_BOARD);
@@ -1014,6 +1033,7 @@ void CoreLogic::updateRightOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(13, OUT_OF_BOARD);
         m_dynamicPieceBoardState = 6;
     }
+    //check first column of dynamic shape
     else if ((getBoardIndexFromPieceIndex(0)) % TABLE_WIDTH == 0)
     {
         m_dynamicPiece.replace(3, OUT_OF_BOARD);
@@ -1034,6 +1054,7 @@ void CoreLogic::updateRightOutOfBoardPieceIndexes()
         m_dynamicPiece.replace(12, OUT_OF_BOARD);
         m_dynamicPieceBoardState = 7;
     }
+    //otherwise, shape is entirely inside board
     else
     {
         m_dynamicPieceBoardState = -1;
@@ -1045,14 +1066,10 @@ void CoreLogic::updateRightOutOfBoardPieceIndexes()
             }
         }
     }
-    for (int i = 0; i < m_dynamicPiece.size(); i++)
-    {
-        qDebug () << m_dynamicPiece.at(i);
-    }
-    qDebug () << "---------";
 }
 void CoreLogic::rotatePiece()
 {
+    //Save color to tmp variable, reassign, and repeat
     QString color = m_dynamicPiece.at(0);
     m_dynamicPiece.replace(0, m_dynamicPiece.at(12));
     m_dynamicPiece.replace(12, m_dynamicPiece.at(15));
@@ -1090,11 +1107,16 @@ void CoreLogic::movePieceDown()
 }
 void CoreLogic::movePieceRight()
 {
+    //move
     setPieceX(m_pieceX + 15);
+
+    //if shape is partially out of board from right bound, update right indexes
     if (m_dynamicPieceBoardState == -1 || m_dynamicPieceBoardState > 3)
     {
         updateRightOutOfBoardPieceIndexes();
     }
+
+    //check board state and update out of board indexes
     else if (m_dynamicPieceBoardState == 2)
     {
         if (m_dynamicPiece.at(2) == OUT_OF_BOARD)
@@ -1107,6 +1129,7 @@ void CoreLogic::movePieceRight()
             m_dynamicPiece.replace(14, TRANSPARENT);
         m_dynamicPieceBoardState = 3;
     }
+    //check board state and update out of board indexes
     else if (m_dynamicPieceBoardState == 3)
     {
         if (m_dynamicPiece.at(1) == OUT_OF_BOARD)
@@ -1123,11 +1146,15 @@ void CoreLogic::movePieceRight()
 }
 void CoreLogic::movePieceLeft()
 {
+    //move
     setPieceX(m_pieceX - 15);
+
+    //if shape is partially out of board from left bound, update left indexes
     if (m_dynamicPieceBoardState == -1 || m_dynamicPieceBoardState < 4)
     {
         updateLeftOutOfBoardPieceIndexes();
     }
+    //check board state and update out of board indexes
     else if (m_dynamicPieceBoardState == 5)
     {
         if (m_dynamicPiece.at(1) == OUT_OF_BOARD)
@@ -1140,6 +1167,7 @@ void CoreLogic::movePieceLeft()
             m_dynamicPiece.replace(13, TRANSPARENT);
         m_dynamicPieceBoardState = 4;
     }
+    //check board state and update out of board indexes
     else if (m_dynamicPieceBoardState == 4)
     {
         if (m_dynamicPiece.at(2) == OUT_OF_BOARD)
@@ -1160,6 +1188,7 @@ void CoreLogic::resetPiece()
     loadNewPiece();
     emit dynamicPieceChanged();
 
+    //set at top position
     setPieceX(180);
     setPieceY(0);
 
